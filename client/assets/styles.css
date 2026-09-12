@@ -1,0 +1,499 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --chamber: #10262c;
+  --console: #d9d4cc;
+  --surface: #eeebe4;
+  --ink: #1c2124;
+  --muted: #6d7378;
+  --line: #c6c1b8;
+  --orange: #e25b1c;
+  --orange-2: #c74d16;
+  --cyan: #2eb3c0;
+  --danger: #c4473a;
+  --tile: 5.5rem;
+  --radius: 16px;
+  --ease: 160ms ease;
+  --sans: Geist, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, monospace;
+}
+
+html {
+  min-height: 100%;
+  background-color: var(--chamber);
+  background-image:
+    radial-gradient(
+      ellipse 90% 60% at 50% -10%,
+      rgba(46, 179, 192, 0.2),
+      transparent 55%
+    ),
+    linear-gradient(rgba(0, 0, 0, 0.4) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.4) 2px, transparent 2px),
+    linear-gradient(rgba(140, 220, 230, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 220, 230, 0.1) 1px, transparent 1px);
+  background-size:
+    auto,
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile);
+  background-position:
+    0 0,
+    center 0,
+    center 0,
+    calc(50% + 1px) 1px,
+    calc(50% + 1px) 1px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.45;
+  background: transparent;
+}
+
+.frame {
+  width: min(50rem, calc(100% - 2rem));
+  margin: 2.75rem auto;
+  overflow: hidden;
+  background: var(--console);
+  border-radius: var(--radius);
+  box-shadow:
+    0 24px 64px rgba(0, 10, 14, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 1.2rem 1.4rem 1.05rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.emblem {
+  width: 2.1rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  color: var(--cyan);
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  background: var(--chamber);
+}
+
+.emblem svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.brand {
+  flex: 1;
+  min-width: 0;
+}
+
+.kicker {
+  margin: 0 0 0.12rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 620;
+  letter-spacing: -0.03em;
+}
+
+.refresh {
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.refresh:hover {
+  color: #fff;
+  background: var(--cyan);
+  box-shadow: none;
+}
+
+.refresh:disabled,
+.refresh.htmx-request {
+  color: var(--muted);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: default;
+  transform: none;
+}
+
+.refresh svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.refresh.htmx-request svg {
+  animation: spin 0.7s linear infinite;
+}
+
+main {
+  padding: 1.15rem 1.3rem 1.35rem;
+}
+
+h2,
+h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+
+h4 {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.panel {
+  margin-bottom: 0.85rem;
+  padding: 1rem 1.05rem 1.05rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.panel > h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel > h2::before {
+  content: "";
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+.panel-available > h2::before {
+  background: var(--cyan);
+}
+
+.lede {
+  flex: 1 1 100%;
+  margin: 0 0 0.1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 38rem;
+}
+
+.server {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+input {
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  color: var(--ink);
+  background: #e4dfd6;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  transition:
+    border-color var(--ease),
+    box-shadow var(--ease),
+    background var(--ease);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  background: #f6f3ed;
+  box-shadow: 0 0 0 3px rgba(46, 179, 192, 0.2);
+}
+
+button {
+  padding: 0.5rem 0.9rem;
+  color: #fff;
+  background: var(--ink);
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    transform var(--ease);
+}
+
+button:hover {
+  background: var(--orange);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+form[hx-post="/device/attach"] button {
+  background: var(--orange);
+}
+
+form[hx-post="/device/attach"] button:hover {
+  background: var(--orange-2);
+}
+
+form[hx-post="/device/detach"] button {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+form[hx-post="/device/detach"] button:hover {
+  background: var(--cyan);
+  box-shadow: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.62rem 0.4rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+td {
+  font-size: 0.94rem;
+}
+
+td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.host {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.84rem;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.pill-live {
+  color: #9a3d14;
+  background: #f0d2c0;
+}
+
+.pill-ready {
+  color: #0f6b74;
+  background: #cfe8eb;
+}
+
+.empty,
+.muted {
+  margin: 0.15rem 0;
+  color: var(--muted);
+}
+
+.looking {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.2rem 0;
+}
+
+.spinner {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--line);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.error {
+  color: var(--danger);
+  white-space: pre-wrap;
+  margin: 0 0 1rem;
+}
+
+#notifications:empty {
+  display: none;
+}
+
+#notifications:not(:empty) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+#notifications > div {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+#notifications form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+}
+
+#notifications h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#notifications button {
+  padding: 0.2rem 0.55rem;
+  background: transparent;
+  color: var(--muted);
+}
+
+#notifications button:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.notification-ERROR,
+.notification-error {
+  border-left: 4px solid var(--danger);
+}
+
+.notification-WARN,
+.notification-warn {
+  border-left: 4px solid #d4a017;
+}
+
+.notification-INFO,
+.notification-info {
+  border-left: 4px solid var(--cyan);
+}
+
+.notification-DEBUG,
+.notification-debug,
+.notification-TRACE,
+.notification-trace {
+  border-left: 4px solid var(--muted);
+}
+
+td form {
+  margin: 0;
+}
+
+.colophon {
+  margin: 0.2rem 0.1rem 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .frame {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .masthead {
+    flex-wrap: wrap;
+  }
+
+  .refresh {
+    margin-left: auto;
+  }
+
+  input[name="ip"] {
+    width: 12rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .refresh.htmx-request svg {
+    animation: none;
+  }
+}

@@ -1,0 +1,13 @@
+{% for n in notifications %}
+<div class="notification-{{ n.level }}">
+  <form
+    hx-post="/notification/dismiss"
+    hx-target="#notifications"
+    hx-swap="innerHTML"
+  >
+    <input type="hidden" name="id" value="{{ n.id }}" />
+    <h3 class="notification-text-{{ n.level }}">{{ n.message }}</h3>
+    <button type="submit">x</button>
+  </form>
+</div>
+{% endfor %}

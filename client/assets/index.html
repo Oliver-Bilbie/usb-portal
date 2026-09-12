@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>USB Portal</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/htmx.min.js"></script>
+  </head>
+  <body>
+    <div class="frame">
+      <header class="masthead">
+        <div class="emblem" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 577.4 577.4">
+            <path
+              fill="currentColor"
+              d="M474.025 147.726h-77.903c-7.913 0-14.337 6.417-14.337 14.337v77.903c0 7.919 6.424 14.337 14.337 14.337h10.088v43.001c0 5.373-4.378 9.75-9.749 9.75h-78.9v-187.42h37.278c3.645-.049 7.083-2.03 8.831-5.271 1.689-3.271 1.504-7.224-.471-10.259L297.023 4.492C295.162 1.683 292.043 0 288.679 0c-3.307.065-6.52 1.663-8.323 4.492l-66.084 99.584c-2.03 3.091-2.291 7.028-.544 10.231 1.728 3.27 5.186 5.329 8.886 5.329h37.224v187.42h-78.899c-5.374 0-9.751-4.377-9.751-9.75v-51.609c14.673-9.488 24.429-25.92 24.429-44.69 0-29.425-23.864-53.291-53.289-53.291-29.425 0-53.289 23.864-53.289 53.291 0 18.772 9.751 35.203 24.429 44.69v51.609c0 37.203 30.27 67.476 67.473 67.476h78.901v114.637c-14.676 9.5-24.431 25.92-24.431 44.693 0 29.424 23.866 53.289 53.291 53.289 29.425 0 53.287-23.863 53.287-53.289 0-18.773-9.75-35.193-24.429-44.693V364.78h78.901c37.203 0 67.473-30.271 67.473-67.476v-43.001h10.091c7.908 0 14.336-6.416 14.336-14.337v-77.903c0-7.92-6.427-14.336-14.338-14.336z"
+            />
+          </svg>
+        </div>
+        <div class="brand">
+          <p class="kicker">Device Relay Facility</p>
+          <h1>USB Portal</h1>
+        </div>
+        <button
+          type="button"
+          class="refresh"
+          aria-label="Refresh"
+          title="Refresh"
+          hx-get="/refresh"
+          hx-target="#body"
+          hx-swap="innerHTML"
+          hx-disabled-elt="this"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12a9 9 0 1 1-3-6.7" />
+            <polyline points="21 3 21 9 15 9" />
+          </svg>
+        </button>
+      </header>
+      <main
+        hx-get="/refresh"
+        hx-trigger="every 10s"
+        hx-target="#body"
+        hx-swap="innerHTML"
+      >
+        <div id="body">
+          <section class="panel">
+            <h2>Connected Devices</h2>
+            <div id="connected">
+              <p
+                class="muted looking"
+                hx-get="/connected"
+                hx-trigger="load"
+                hx-target="#connected"
+              >
+                <span class="spinner"></span>Scanning connected devices...
+              </p>
+            </div>
+          </section>
+
+          <section class="panel panel-available">
+            <h2>Available Devices</h2>
+            <div id="available">
+              <p
+                class="muted looking"
+                hx-get="/available"
+                hx-trigger="load"
+                hx-target="#available"
+              >
+                <span class="spinner"></span>Searching for servers...
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <h2>Manual Uplink</h2>
+          <form
+            class="server"
+            hx-get="/add_manual_server"
+            hx-target="#body"
+            hx-swap="innerHTML"
+          >
+            <p class="lede">
+              If devices are not discovered automatically, establish a manual
+              connection to their server.
+            </p>
+            <label>
+              <h4>Server IP</h4>
+              <input name="ip" required placeholder="192.168.1.10" />
+            </label>
+            <label>
+              <h4>Port</h4>
+              <input name="port" value="3241" size="5" />
+            </label>
+            <button type="submit">Connect</button>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

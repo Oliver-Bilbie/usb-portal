@@ -1,0 +1,15 @@
+[Unit]
+Description=USB Portal client
+Documentation=https://github.com/oliver-bilbie/usb-portal
+After=network-online.target systemd-modules-load.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/modprobe vhci-hcd
+ExecStart=/usr/bin/usb-portal-client
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

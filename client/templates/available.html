@@ -1,0 +1,30 @@
+{% if devices.is_empty() %}
+<p class="empty">No remote devices found.</p>
+{% else %}
+<table>
+  <thead>
+    <tr>
+      <th>Host</th>
+      <th>Device</th>
+      <th>State</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in devices %}
+    <tr>
+      <td class="host">{{ d.server.hostname }}</td>
+      <td>{{ d.device }}</td>
+      <td><span class="pill pill-ready">Ready</span></td>
+      <td>
+        <form hx-post="/device/attach" hx-target="#body" hx-swap="innerHTML">
+          <input type="hidden" name="ip" value="{{ d.server.ip }}" />
+          <input type="hidden" name="bus_id" value="{{ d.device.bus_id }}" />
+          <button type="submit">Attach</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}

@@ -1,0 +1,15 @@
+[Unit]
+Description=USB Portal server
+Documentation=https://github.com/oliver-bilbie/usb-portal
+After=network-online.target usbipd.service
+Wants=network-online.target
+Requires=usbipd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/usb-portal-server
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

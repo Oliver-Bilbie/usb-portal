@@ -1,0 +1,29 @@
+{% if devices.is_empty() %}
+<p class="empty">No devices attached.</p>
+{% else %}
+<table>
+  <thead>
+    <tr>
+      <th>Device</th>
+      <th>State</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in devices %}
+    <tr>
+      <td>{{ d.device }}</td>
+      <td><span class="pill pill-live">Linked</span></td>
+      <td>
+        <form hx-post="/device/detach" hx-target="#body" hx-swap="innerHTML">
+          <input type="hidden" name="ip" value="{{ d.server_ip }}" />
+          <input type="hidden" name="bus_id" value="{{ d.device.bus_id }}" />
+          <input type="hidden" name="vhci_port" value="{{ d.vhci_port }}" />
+          <button type="submit">Detach</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}

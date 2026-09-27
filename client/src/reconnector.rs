@@ -1,13 +1,12 @@
 use crate::helpers::attach_device;
+use crate::service::Service;
 use crate::state::State;
 use futures::future::join_all;
 use log::*;
 use std::collections::HashSet;
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
-use tokio::task::JoinHandle;
 use tokio::time::{Duration, Instant};
-use tokio_util::sync::CancellationToken;
 use usb_portal_lib::prelude::*;
 
 struct ReconnectStatus {
@@ -27,53 +26,29 @@ impl ReconnectStatus {
 }
 
 pub struct Reconnector {
-    thread: Option<JoinHandle<()>>,
-    token: CancellationToken,
+    service: Service,
 }
 
 impl Reconnector {
     pub fn init(state: Arc<State>) -> Reconnector {
-        debug!("Starting reconnector thread");
-        let token = CancellationToken::new();
-        let thread = Some(tokio::spawn({
-            let d = Arc::new(Mutex::new(HashMap::new()));
-            let s = state.clone();
-            let t = token.clone();
-            let mut next_start = tokio::time::Instant::now();
-            async move {
-                loop {
-                    tokio::select! {
-                        _ = t.cancelled() => {
-                            return;
-                        },
-                        _ = tokio::time::sleep_until(next_start) => {
-                            next_start = tokio::time::Instant::now() + MIN_RETRY_INTERVAL;
-                            do_reconnect(&d, &s).await;
-                        }
-                    };
+        let loop_fn = {
+            move || {
+                let d = Arc::new(Mutex::new(HashMap::new()));
+                let s = state.clone();
+                async move {
+                    let next_start = tokio::time::Instant::now() + MIN_RETRY_INTERVAL;
+                    do_reconnect(&d, &s).await;
+                    tokio::time::sleep_until(next_start).await;
+                    Ok(())
                 }
             }
-        }));
-        Reconnector { thread, token }
+        };
+        let service = Service::init("Reconnector", loop_fn);
+        Reconnector { service }
     }
 
     pub async fn shutdown(&mut self) {
-        debug!("Gracefully stopping the reconnector thread");
-        self.token.cancel();
-        if let Some(thread) = self.thread.take() {
-            _ = thread.await;
-        }
-    }
-}
-
-impl Drop for Reconnector {
-    fn drop(&mut self) {
-        // Async drop is not yet supported in stable Rust, so we cannot await the termination of the
-        // thread. Use the shutdown method instead.
-        if !self.token.is_cancelled() {
-            warn!("The reconnector thread was not terminated gracefully");
-            self.token.cancel();
-        }
+        self.service.shutdown().await;
     }
 }
 

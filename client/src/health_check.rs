@@ -1,4 +1,4 @@
-use crate::{helpers::ping, state::State};
+use crate::{helpers::ping, service::Service, state::State};
 use futures::future::join_all;
 use log::*;
 use std::{
@@ -6,61 +6,35 @@ use std::{
     net::Ipv4Addr,
     sync::Arc,
 };
-use tokio::task::JoinHandle;
-use tokio_util::sync::CancellationToken;
 use usb_portal_lib::prelude::*;
 
 pub struct HealthCheck {
-    thread: Option<JoinHandle<()>>,
-    token: CancellationToken,
+    service: Service,
 }
 
 impl HealthCheck {
     pub fn init(state: Arc<State>) -> HealthCheck {
-        debug!("Starting health check thread");
-        let token = CancellationToken::new();
-        let thread = Some(tokio::spawn({
-            let s = state.clone();
-            let t = token.clone();
-            let mut next_start = tokio::time::Instant::now();
-            async move {
-                loop {
-                    tokio::select! {
-                        _ = t.cancelled() => {
-                            return;
-                        },
-                        _ = tokio::time::sleep_until(next_start) => {
-                            next_start = tokio::time::Instant::now() + HEALTH_CHECK_INTERVAL;
-                            do_health_check(s.clone()).await;
-                        }
-                    };
+        let loop_fn = {
+            move || {
+                let s = state.clone();
+                async move {
+                    let next_start = tokio::time::Instant::now() + HEALTH_CHECK_INTERVAL;
+                    do_health_check(&s).await;
+                    tokio::time::sleep_until(next_start).await;
+                    Ok(())
                 }
             }
-        }));
-        HealthCheck { thread, token }
+        };
+        let service = Service::init("Health check", loop_fn);
+        HealthCheck { service }
     }
 
     pub async fn shutdown(&mut self) {
-        debug!("Gracefully stopping the health check thread");
-        self.token.cancel();
-        if let Some(thread) = self.thread.take() {
-            _ = thread.await;
-        }
+        self.service.shutdown().await;
     }
 }
 
-impl Drop for HealthCheck {
-    fn drop(&mut self) {
-        // Async drop is not yet supported in stable Rust, so we cannot await the termination of the
-        // thread. Use the shutdown method instead.
-        if !self.token.is_cancelled() {
-            warn!("The health check thread was not terminated gracefully");
-            self.token.cancel();
-        }
-    }
-}
-
-async fn do_health_check(state: Arc<State>) {
+async fn do_health_check(state: &Arc<State>) {
     let missing_servers = update_server_health(&state).await;
     let expected_devices = state.get_connected_devices();
 

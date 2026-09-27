@@ -3,6 +3,7 @@ mod helpers;
 mod notification;
 mod reconnector;
 mod render;
+mod service;
 mod state;
 mod usbip;
 

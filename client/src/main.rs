@@ -6,7 +6,6 @@ mod render;
 mod service;
 mod state;
 mod tray;
-mod usbip;
 
 use crate::{
     health_check::HealthCheck, helpers::*, reconnector::Reconnector, state::State, tray::Tray,

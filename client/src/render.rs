@@ -1,5 +1,7 @@
 use crate::{
-    helpers::fetch_available, notification::Notification, state::State, usbip::fetch_connected,
+    helpers::{fetch_available, fetch_connected},
+    notification::Notification,
+    state::State,
 };
 use askama::Template;
 use log::*;

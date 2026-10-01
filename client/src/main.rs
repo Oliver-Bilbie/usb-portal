@@ -5,9 +5,12 @@ mod reconnector;
 mod render;
 mod service;
 mod state;
+mod tray;
 mod usbip;
 
-use crate::{health_check::HealthCheck, helpers::*, reconnector::Reconnector, state::State};
+use crate::{
+    health_check::HealthCheck, helpers::*, reconnector::Reconnector, state::State, tray::Tray,
+};
 use axum::{
     Form, Router,
     extract::{
@@ -148,6 +151,7 @@ async fn handle_geist_mono() -> impl IntoResponse {
 async fn main() {
     logger::init();
     let state: Arc<State> = Arc::new(State::new());
+    let mut tray = Tray::init();
     let mut hc = HealthCheck::init(state.clone());
     let mut rc = Reconnector::init(state.clone());
 
@@ -182,6 +186,7 @@ async fn main() {
     println!();
     hc.shutdown().await;
     rc.shutdown().await;
+    tray.shutdown().await;
     release_all(state).await;
     info!("The client has stopped");
 }

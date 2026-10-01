@@ -6,7 +6,8 @@ use tokio::net::TcpListener;
 use usb_portal_lib::prelude::*;
 
 async fn handle_list() -> Result<String, (StatusCode, String)> {
-    let resp = match usbip::list().await {
+    let task = UsbipTask::List;
+    let resp = match task.run().await {
         Ok(v) => v,
         Err(msg) => return Err((StatusCode::INTERNAL_SERVER_ERROR, msg)),
     };
@@ -21,14 +22,16 @@ async fn handle_list() -> Result<String, (StatusCode, String)> {
 }
 
 async fn handle_bind(Path(id): Path<String>) -> Result<String, (StatusCode, String)> {
-    match usbip::bind(&id).await {
+    let task = UsbipTask::Bind(BindArgs { bus_id: &id });
+    match task.run().await {
         Ok(v) => Ok(v),
         Err(msg) => return Err((StatusCode::INTERNAL_SERVER_ERROR, msg)),
     }
 }
 
 async fn handle_unbind(Path(id): Path<String>) -> Result<String, (StatusCode, String)> {
-    match usbip::unbind(&id).await {
+    let task = UsbipTask::Unbind(UnbindArgs { bus_id: &id });
+    match task.run().await {
         Ok(v) => Ok(v),
         Err(msg) => return Err((StatusCode::INTERNAL_SERVER_ERROR, msg)),
     }
@@ -43,7 +46,8 @@ async fn handle_ping() -> String {
 }
 
 async fn release_all() {
-    let devices = match usbip::list().await {
+    let task = UsbipTask::List;
+    let devices = match task.run().await {
         Ok(v) => read_devices(&v),
         Err(msg) => {
             error!("Unable to release devices\n{}", msg);

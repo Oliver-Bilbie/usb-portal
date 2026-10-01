@@ -82,7 +82,10 @@ async fn update_missing_devices(
                 info!("Connection to {} was lost", d.device);
                 state.drop_connected_device(d);
                 state.add_missing_device(d);
-                let _ = usbip::detach(&d.vhci_port).await;
+                let task = UsbipTask::Detach(DetachArgs {
+                    vhci_port: &d.vhci_port,
+                });
+                let _ = task.run().await;
             }),
     )
     .await;

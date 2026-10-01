@@ -4,4 +4,4 @@ pub use crate::discover::*;
 pub use crate::logger;
 pub use crate::shutdown::*;
 pub use crate::types::*;
-pub use crate::usbip;
+pub use crate::usbip::*;

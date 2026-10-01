@@ -99,7 +99,8 @@ pub async fn attach_device(
             return false;
         }
     }
-    if let Err(msg) = usbip::attach(&ip, &bus_id).await {
+    let task = UsbipTask::Attach(AttachArgs { ip, bus_id });
+    if let Err(msg) = task.run().await {
         if !silent {
             state.push_notification(
                 Level::Warn,
@@ -181,7 +182,8 @@ pub async fn detach_device(
         );
         return false;
     }
-    if let Err(msg) = usbip::detach(vhci_port).await {
+    let task = UsbipTask::Detach(DetachArgs { vhci_port });
+    if let Err(msg) = task.run().await {
         state.push_notification(
             Level::Warn,
             format!("unable to detach vhci port {}: {}", vhci_port, msg),
@@ -220,7 +222,10 @@ pub async fn release_all(state: Arc<State>) {
         }
     };
     for d in devices {
-        match usbip::detach(&d.vhci_port).await {
+        let task = UsbipTask::Detach(DetachArgs {
+            vhci_port: &d.vhci_port,
+        });
+        match task.run().await {
             Ok(_) => {
                 info!("Released device {}", d.device);
             }
